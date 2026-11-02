@@ -45,8 +45,10 @@ class FieldSpec {
       return 'Введите корректный email';
     }
     if (kind == FieldKind.phone &&
-        !RegExp(r'^\+?[0-9 ()-]{10,20}$').hasMatch(v)) {
-      return 'Введите телефон: от 10 до 20 символов';
+        (!RegExp(r'^\+?[0-9 ()-]{10,20}$').hasMatch(v) ||
+            v.replaceAll(RegExp(r'[^0-9]'), '').length < 10 ||
+            v.replaceAll(RegExp(r'[^0-9]'), '').length > 15)) {
+      return 'Телефон: 10–15 цифр, до 20 символов';
     }
     if (kind == FieldKind.integer ||
         kind == FieldKind.decimal ||

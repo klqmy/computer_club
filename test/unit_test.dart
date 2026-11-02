@@ -81,6 +81,10 @@ void main() {
     expect(entities['customers']!.field('email').validate('no-at'), isNotNull);
     expect(entities['stations']!.field('ram_gb').validate('2'), isNotNull);
     expect(entities['stations']!.field('ram_gb').validate('32.5'), isNotNull);
+    expect(
+      entities['customers']!.field('phone').validate('----------'),
+      isNotNull,
+    );
     expect(entities['tariffs']!.field('price_per_hour').parse('150,50'), 150.5);
   });
   test('Не существующие даты и значения справочника отклоняются', () {
