@@ -120,13 +120,6 @@ class AppShell extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Text(
-              'Учебный проект · 2026',
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-          ),
         ],
       ),
     );
