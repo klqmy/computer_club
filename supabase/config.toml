@@ -1,0 +1,21 @@
+project_id = "computer_club"
+
+[api]
+enabled = true
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+major_version = 17
+
+[auth]
+enabled = true
+site_url = "https://pulse-computer-club.onrender.com"
+additional_redirect_urls = ["http://localhost:5570"]
+minimum_password_length = 8
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = true

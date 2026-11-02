@@ -1,0 +1,10 @@
+{
+  "version": "0.2.0",
+  "configurations": [{
+    "name": "Пульс · Web",
+    "request": "launch",
+    "type": "dart",
+    "deviceId": "chrome",
+    "args": ["--dart-define-from-file=build-config.json", "--web-port=5570"]
+  }]
+}

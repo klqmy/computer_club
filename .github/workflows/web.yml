@@ -1,0 +1,39 @@
+name: Flutter Web
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verify-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Flutter 3.35.4
+        run: |
+          git clone --depth 1 --branch 3.35.4 https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - run: flutter build web --release --pwa-strategy=none --dart-define-from-file=build-config.json
+      - name: Package
+        run: |
+          cd build/web
+          zip -qr "$GITHUB_WORKSPACE/web.zip" .
+          cd "$GITHUB_WORKSPACE"
+          sha256sum web.zip > web.zip.sha256
+      - name: Publish build for Render
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="web-$GITHUB_SHA"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" web.zip web.zip.sha256 --clobber
+          else
+            gh release create "$tag" web.zip web.zip.sha256 --target "$GITHUB_SHA" --title "Flutter Web $GITHUB_SHA" --notes "Сборка Flutter Web для Render." --latest=false
+          fi

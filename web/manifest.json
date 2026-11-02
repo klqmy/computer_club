@@ -1,0 +1,16 @@
+{
+  "name": "ПУЛЬС · компьютерный клуб",
+  "short_name": "ПУЛЬС",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d131d",
+  "theme_color": "#121925",
+  "description": "Бронирование компьютеров и управление клубом",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
