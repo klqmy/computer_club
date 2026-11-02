@@ -261,6 +261,7 @@ class _RecordFormState extends State<RecordForm> {
         options[c.text] = 'Текущее значение: ${c.text}';
       }
       return DropdownButtonFormField<String>(
+        key: ValueKey('${f.key}:${c.text}'),
         initialValue: c.text.isEmpty ? null : c.text,
         isExpanded: true,
         decoration: InputDecoration(labelText: f.label),

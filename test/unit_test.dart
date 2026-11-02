@@ -94,6 +94,27 @@ void main() {
     );
     expect(entities['bookings']!.field('status').validate('fake'), isNotNull);
     expect(entities['games']!.field('title').validate('  '), isNotNull);
+    expect(
+      entities['bookings']!.field('starts_at').validate('2026-11-02T18:70'),
+      isNotNull,
+    );
+    expect(
+      entities['bookings']!
+          .field('starts_at')
+          .validate('2026-11-02T00:10+03:00'),
+      isNull,
+    );
+    expect(
+      entities['tariffs']!.field('price_per_hour').validate('NaN'),
+      isNotNull,
+    );
+  });
+  test('Повреждённые значения фильтров из URL не попадают в запрос', () {
+    final q = ListQuery.fromUri(
+      Uri.parse('/?state=unknown&zone_id=-1&ram_gb=NaN'),
+      entities['stations']!,
+    );
+    expect(q.filters, isEmpty);
   });
   test('422 сохраняет ошибки конкретных полей', () {
     final e = ApiError.fromDio(

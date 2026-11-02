@@ -180,31 +180,37 @@ class _EntityScreenState extends State<EntityScreen> {
     }
   }
 
-  Widget rowActions(RecordData row) => PopupMenuButton<String>(
-    tooltip: 'Действия',
-    onSelected: (value) {
-      if (value == 'edit') {
-        edit(row);
-      } else if (value == 'games') {
-        selectStationGames(context, row);
-      } else {
-        remove([row['id']], value);
-      }
-    },
-    itemBuilder: (_) => [
-      if (rowWritable(row))
-        const PopupMenuItem(value: 'edit', child: Text('Изменить')),
-      if (writable && widget.spec.key == 'stations')
-        const PopupMenuItem(value: 'games', child: Text('Выбрать игры')),
-      if (rowWritable(row)) ...[
-        if (row['deleted_at'] == null)
-          const PopupMenuItem(value: 'soft', child: Text('В корзину'))
-        else
-          const PopupMenuItem(value: 'restore', child: Text('Восстановить')),
-        const PopupMenuItem(value: 'hard', child: Text('Удалить навсегда')),
+  Widget rowActions(RecordData row) {
+    if (!rowWritable(row) && !(writable && widget.spec.key == 'stations')) {
+      return const SizedBox.shrink();
+    }
+    return PopupMenuButton<String>(
+      tooltip: 'Действия',
+      onSelected: (value) {
+        if (value == 'edit') {
+          edit(row);
+        } else if (value == 'games') {
+          selectStationGames(context, row);
+        } else {
+          remove([row['id']], value);
+        }
+      },
+      itemBuilder: (_) => [
+        if (rowWritable(row))
+          const PopupMenuItem(value: 'edit', child: Text('Изменить')),
+        if (writable && widget.spec.key == 'stations')
+          const PopupMenuItem(value: 'games', child: Text('Выбрать игры')),
+        if (rowWritable(row)) ...[
+          if (row['deleted_at'] == null)
+            const PopupMenuItem(value: 'soft', child: Text('В корзину'))
+          else
+            const PopupMenuItem(value: 'restore', child: Text('Восстановить')),
+          const PopupMenuItem(value: 'hard', child: Text('Удалить навсегда')),
+        ],
       ],
-    ],
-  );
+    );
+  }
+
   void open(RecordData row) => context.go('${widget.uri.path}/${row['id']}');
   Widget filter(FieldSpec f) {
     final value = query.filters[f.key] ?? '';
@@ -243,12 +249,18 @@ class _EntityScreenState extends State<EntityScreen> {
       child: TextFormField(
         key: ValueKey('${f.key}-$value'),
         initialValue: value,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        validator: (v) => (v ?? '').trim().isEmpty ? null : f.validate(v),
         decoration: InputDecoration(
           labelText: f.label,
           hintText: f.kind == FieldKind.dateTime ? 'ГГГГ-ММ-ДД' : null,
           suffixIcon: const Icon(Icons.filter_alt_outlined, size: 18),
         ),
-        onFieldSubmitted: (v) => update({f.key: v.trim()}),
+        onFieldSubmitted: (v) {
+          if (v.trim().isEmpty || f.validate(v) == null) {
+            update({f.key: v.trim()});
+          }
+        },
       ),
     );
   }
@@ -423,6 +435,7 @@ class _EntityScreenState extends State<EntityScreen> {
                   SizedBox(
                     width: 190,
                     child: DropdownButtonFormField<String>(
+                      key: ValueKey(query.sort),
                       initialValue: query.sort,
                       decoration: const InputDecoration(
                         labelText: 'Сортировка',
@@ -432,6 +445,10 @@ class _EntityScreenState extends State<EntityScreen> {
                         const DropdownMenuItem(
                           value: 'id',
                           child: Text('По номеру'),
+                        ),
+                        const DropdownMenuItem(
+                          value: 'created_at',
+                          child: Text('По дате создания'),
                         ),
                         for (final f in widget.spec.fields)
                           DropdownMenuItem(
@@ -702,7 +719,7 @@ class _ReferenceFilterState extends State<_ReferenceFilter> {
         final values = rows.map((r) => '${r['id']}').toSet();
         return DropdownButtonFormField<String>(
           key: ValueKey(widget.value),
-          initialValue: values.contains(widget.value) ? widget.value : '',
+          initialValue: widget.value,
           isExpanded: true,
           decoration: InputDecoration(
             labelText: widget.field.label,
@@ -710,6 +727,11 @@ class _ReferenceFilterState extends State<_ReferenceFilter> {
           ),
           items: [
             const DropdownMenuItem(value: '', child: Text('Все')),
+            if (widget.value.isNotEmpty && !values.contains(widget.value))
+              DropdownMenuItem(
+                value: widget.value,
+                child: Text('#${widget.value} · недоступна'),
+              ),
             for (final r in rows)
               DropdownMenuItem(
                 value: '${r['id']}',

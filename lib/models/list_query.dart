@@ -29,7 +29,9 @@ class ListQuery {
       trash: p['trash'] == 'deleted' ? 'deleted' : 'active',
       filters: {
         for (final key in spec.filterFields)
-          if ((p[key] ?? '').isNotEmpty) key: p[key]!,
+          if ((p[key] ?? '').isNotEmpty &&
+              spec.field(key).validate(p[key]) == null)
+            key: p[key]!,
       },
     );
   }

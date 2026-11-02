@@ -125,7 +125,7 @@ const entities = <String, EntitySpec>{
       FieldSpec('enabled', 'Разрешена', kind: FieldKind.toggle),
     ],
     filterFields: ['station_id', 'game_id', 'enabled'],
-    searchFields: ['version'],
+    searchFields: ['version', 'station_name', 'game_name'],
   ),
   'tariffs': EntitySpec(
     'tariffs',
@@ -234,7 +234,7 @@ const entities = <String, EntitySpec>{
       FieldSpec('valid_until', 'Действует до', kind: FieldKind.date),
     ],
     filterFields: ['level', 'discount_percent', 'valid_until'],
-    searchFields: ['card_number'],
+    searchFields: ['card_number', 'customer_name'],
   ),
   'bookings': EntitySpec(
     'bookings',
@@ -271,7 +271,7 @@ const entities = <String, EntitySpec>{
       FieldSpec('comment', 'Комментарий', required: false, maxLength: 400),
     ],
     filterFields: ['status', 'station_id', 'tariff_id'],
-    searchFields: ['comment'],
+    searchFields: ['comment', 'customer_name', 'station_name'],
     writers: {'operator', 'client'},
   ),
   'sessions': EntitySpec(
@@ -296,7 +296,7 @@ const entities = <String, EntitySpec>{
       FieldSpec('notes', 'Заметка оператора', required: false, maxLength: 400),
     ],
     filterFields: ['booking_id', 'started_at', 'finished_at'],
-    searchFields: ['notes'],
+    searchFields: ['notes', 'customer_name', 'station_name'],
     writers: {'operator'},
   ),
   'payments': EntitySpec(
@@ -333,7 +333,7 @@ const entities = <String, EntitySpec>{
       FieldSpec('paid_at', 'Дата оплаты', kind: FieldKind.dateTime),
     ],
     filterFields: ['method', 'state', 'paid_at'],
-    searchFields: [],
+    searchFields: ['customer_name', 'station_name'],
     writers: {'operator'},
   ),
 };
